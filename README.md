@@ -1,0 +1,2 @@
+这是一个eclipse下创建的给10086发送6666的用例
+请自行导入android.jar、uiautomator.jar
