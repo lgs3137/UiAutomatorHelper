@@ -1,4 +1,4 @@
-package com.github.lgs3137;
+package app;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,6 +13,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 public class UiAutomatorHelper {
+
+	// 以下参数OSX、Linux下需配置sdk、ant绝对路径
+	private static String android = "/Users/lieil/android-sdk-macosx/tools/android";
+	private static String ant = "/Applications/Eclipse.app/Contents/Eclipse/plugins/org.apache.ant_1.9.6.v201510161327/bin/ant";
+	private static String adb = "/Users/lieil/android-sdk-macosx/platform-tools/adb";
 
 	// 以下参数需要配置，用例集id，用例id，安卓id
 	private static String android_id = "";
@@ -83,7 +88,7 @@ public class UiAutomatorHelper {
 		execCmd("cmd /c android create uitest-project -n " + jar_name + " -t "
 				+ android_id + " -p " + workspace_path);
 		}else{
-		execCmd("android create uitest-project -n " + jar_name + " -t "
+		execCmd(android + " create uitest-project -n " + jar_name + " -t "
 				+ android_id + " -p " + workspace_path);
 		}
 		return false;
@@ -95,7 +100,7 @@ public class UiAutomatorHelper {
 		execCmd("cmd /c android create uitest-project -n " + jar_name + " -t "
 				+ android_id + " -p " + "\""+workspace_path+ "\"");
 		}else{
-		execCmd("android create uitest-project -n " + jar_name + " -t "
+		execCmd(android + " create uitest-project -n " + jar_name + " -t "
 				+ android_id + " -p " + workspace_path);
 		}
 	}
@@ -140,27 +145,40 @@ public class UiAutomatorHelper {
 		if (System.getProperty("os.name").contains("Windows")) {
 			execCmd("cmd /c ant");
 		}else{
-		execCmd("ant");
+		execCmd(ant);
 		}
 	}
 
 	// 4---push jar
 	public void pushTestJar(String localPath) {
+		
 		if (System.getProperty("os.name").contains("Windows")) {
 		localPath="\""+localPath+"\"";
-		}
-		System.out.println("----jar包路径： "+localPath);
 		String pushCmd = "adb push " + localPath + " /data/local/tmp/";
+		System.out.println("----jar包路径： "+localPath);
 		System.out.println("----" + pushCmd);
 		execCmd(pushCmd);
-	}
+	}else{
+		String pushCmd = adb + " push " + localPath + " /data/local/tmp/";
+		System.out.println("----jar包路径： "+localPath);
+		System.out.println("----" + pushCmd);
+		execCmd(pushCmd);
+		}
+	}	
 
 	// 运行测试
 	public void runTest(String jarName, String testName) {
+		if (System.getProperty("os.name").contains("Windows")) {
 		String runCmd = "adb shell uiautomator runtest ";
 		String testCmd = jarName + ".jar " + "--nohup -c " + testName;
 		System.out.println("----runTest:  " + runCmd + testCmd);
 		execCmd(runCmd + testCmd);
+		}else{
+			String runCmd = adb + " shell uiautomator runtest ";
+			String testCmd = jarName + ".jar " + "--nohup -c " + testName;
+			System.out.println("----runTest:  " + runCmd + testCmd);
+			execCmd(runCmd + testCmd);
+		}
 	}
 
 	public String getWorkSpase() {
